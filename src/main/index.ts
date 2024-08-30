@@ -1,7 +1,6 @@
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import { exec } from 'child_process'
 import { app, BrowserWindow, shell } from 'electron'
-import * as path from 'path'
 import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
 
@@ -37,9 +36,7 @@ function createWindow(): void {
   }
 }
 
-const scriptPath = path.resolve(__dirname, '../python/script.py')
-
-// Spusťte Python skript
+// Execute python script
 exec(`python3 python/skript.py`, (error, stdout, stderr) => {
   if (error) {
     console.error(`Chyba při spuštění skriptu: ${error.message}`)
