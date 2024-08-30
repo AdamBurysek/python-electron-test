@@ -1,12 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { electronAPI } from '@electron-toolkit/preload'
 import { contextBridge, ipcRenderer } from 'electron'
 
 // Custom APIs for renderer
 const api = {
-  send: (channel, data) => {
+  send: (channel: string, data: string): void => {
     ipcRenderer.send(channel, data)
   },
-  receive: (channel, func) => {
+  receive: (channel: string, func: any): any => {
     ipcRenderer.on(channel, (event, ...args) => func(...args))
   }
 }
