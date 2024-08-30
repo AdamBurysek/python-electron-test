@@ -79,13 +79,15 @@ ipcMain.on('run-python-script', (event) => {
     pythonProcess = spawn('python3', ['python/skript.py'])
 
     pythonProcess.stdout.on('data', (data) => {
-      console.log(`Výstup skriptu: ${data}`)
-      event.sender.send('python-output', data.toString()) // Posíláme data do renderer procesu
+      const output = data.toString()
+      console.log(`Výstup skriptu: ${output}`)
+      event.sender.send('python-output', output) // Posíláme data do renderer procesu
     })
 
     pythonProcess.stderr.on('data', (data) => {
-      console.error(`Chyba ve skriptu: ${data}`)
-      event.sender.send('python-error', data.toString()) // Posíláme chyby do renderer procesu
+      const errorOutput = data.toString()
+      console.error(`Chyba ve skriptu: ${errorOutput}`)
+      event.sender.send('python-error', errorOutput) // Posíláme chyby do renderer procesu
     })
 
     pythonProcess.on('close', (code) => {
