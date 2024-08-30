@@ -3,6 +3,7 @@ productName: python-electron-test
 directories:
   buildResources: build
 files:
+  - 'python/**'
   - '!**/.vscode/*'
   - '!src/*'
   - '!electron.vite.config.{js,ts,mjs,cjs}'
