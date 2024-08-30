@@ -7,7 +7,7 @@ function App(): JSX.Element {
   useEffect(() => {
     // Přijímání výstupu z Python skriptu
     window.api.receive('python-output', (data: string) => {
-      setOutput((prevOutput) => prevOutput + data)
+      setOutput(data)
     })
 
     // Přijímání chybových zpráv z Python skriptu
