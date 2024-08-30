@@ -1,8 +1,10 @@
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
-import { exec } from 'child_process'
-import { app, BrowserWindow, shell } from 'electron'
+import { ChildProcessWithoutNullStreams, spawn } from 'child_process'
+import { app, BrowserWindow, ipcMain, shell } from 'electron'
 import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
+
+let pythonProcess: ChildProcessWithoutNullStreams | null = null
 
 function createWindow(): void {
   // Create the browser window.
@@ -35,19 +37,6 @@ function createWindow(): void {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 }
-
-// Execute python script
-exec(`python3 python/skript.py`, (error, stdout, stderr) => {
-  if (error) {
-    console.error(`Chyba při spuštění skriptu: ${error.message}`)
-    return
-  }
-  if (stderr) {
-    console.error(`Chyba ve skriptu: ${stderr}`)
-    return
-  }
-  console.log(`Výstup skriptu: ${stdout}`)
-})
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -83,3 +72,36 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
+
+// Handle the IPC message to run the Python script
+ipcMain.on('run-python-script', () => {
+  if (!pythonProcess) {
+    pythonProcess = spawn('python3', ['python/skript.py'])
+
+    pythonProcess.stdout.on('data', (data) => {
+      console.log(`Výstup skriptu: ${data}`)
+    })
+
+    pythonProcess.stderr.on('data', (data) => {
+      console.error(`Chyba ve skriptu: ${data}`)
+    })
+
+    pythonProcess.on('close', (code) => {
+      console.log(`Skript skončil s kódem ${code}`)
+      pythonProcess = null
+    })
+  } else {
+    console.log('Skript již běží.')
+  }
+})
+
+// Handle the IPC message to stop the Python script
+ipcMain.on('stop-python-script', () => {
+  if (pythonProcess) {
+    pythonProcess.kill()
+    pythonProcess = null
+    console.log('Skript byl úspěšně zastaven.')
+  } else {
+    console.log('Skript neběží.')
+  }
+})
