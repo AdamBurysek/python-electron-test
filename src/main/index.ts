@@ -1,6 +1,8 @@
-import { app, shell, BrowserWindow } from 'electron'
+import { electronApp, is, optimizer } from '@electron-toolkit/utils'
+import { exec } from 'child_process'
+import { app, BrowserWindow, shell } from 'electron'
+import * as path from 'path'
 import { join } from 'path'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
 function createWindow(): void {
@@ -34,6 +36,21 @@ function createWindow(): void {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 }
+
+const scriptPath = path.resolve(__dirname, '../python/script.py')
+
+// Spusťte Python skript
+exec(`python3 python/skript.py`, (error, stdout, stderr) => {
+  if (error) {
+    console.error(`Chyba při spuštění skriptu: ${error.message}`)
+    return
+  }
+  if (stderr) {
+    console.error(`Chyba ve skriptu: ${stderr}`)
+    return
+  }
+  console.log(`Výstup skriptu: ${stdout}`)
+})
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
