@@ -74,20 +74,23 @@ app.on('window-all-closed', () => {
 // code. You can also put them in separate files and require them here.
 
 // Handle the IPC message to run the Python script
-ipcMain.on('run-python-script', () => {
+ipcMain.on('run-python-script', (event) => {
   if (!pythonProcess) {
     pythonProcess = spawn('python3', ['python/skript.py'])
 
     pythonProcess.stdout.on('data', (data) => {
       console.log(`Výstup skriptu: ${data}`)
+      event.sender.send('python-output', data.toString()) // Posíláme data do renderer procesu
     })
 
     pythonProcess.stderr.on('data', (data) => {
       console.error(`Chyba ve skriptu: ${data}`)
+      event.sender.send('python-error', data.toString()) // Posíláme chyby do renderer procesu
     })
 
     pythonProcess.on('close', (code) => {
       console.log(`Skript skončil s kódem ${code}`)
+      event.sender.send('python-close', `Skript skončil s kódem ${code}`)
       pythonProcess = null
     })
   } else {
