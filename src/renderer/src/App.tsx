@@ -1,10 +1,14 @@
 function App(): JSX.Element {
-  const handleRunScript = () => {
-    window.api.send('run-python-script')
+  const handleRunScript = (): void => {
+    if (window.api) {
+      window.api.send('run-python-script')
+    }
   }
 
-  const handleStopScript = () => {
-    window.api.send('stop-python-script')
+  const handleStopScript = (): void => {
+    if (window.api) {
+      window.api.send('stop-python-script')
+    }
   }
   return (
     <div className="container">
