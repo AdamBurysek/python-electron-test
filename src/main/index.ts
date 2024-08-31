@@ -1,7 +1,7 @@
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process'
 import { app, BrowserWindow, ipcMain, shell } from 'electron'
-import { join } from 'path'
+import path, { join } from 'path'
 import icon from '../../resources/icon.png?asset'
 
 let pythonProcess: ChildProcessWithoutNullStreams | null = null
@@ -76,7 +76,10 @@ app.on('window-all-closed', () => {
 // Handle the IPC message to run the Python script
 ipcMain.on('run-python-script', (event) => {
   if (!pythonProcess) {
-    pythonProcess = spawn('python3', ['python/skript.py'])
+    const scriptPath = path.join(app.getAppPath(), '..', 'app.asar.unpacked', 'python', 'skript.py')
+
+    // Spuštění Python skriptu s absolutní cestou
+    pythonProcess = spawn('python3', [scriptPath])
 
     pythonProcess.stdout.on('data', (data) => {
       const output = data.toString()
