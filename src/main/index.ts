@@ -1,14 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
-import { ChildProcessWithoutNullStreams, spawn } from 'child_process'
+import axios from 'axios'
 import { app, BrowserWindow, ipcMain, shell } from 'electron'
-import path, { join } from 'path'
+import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
 
-let pythonProcess: ChildProcessWithoutNullStreams | null = null
+let mainWindow: BrowserWindow | null = null
 
 function createWindow(): void {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
     show: false,
@@ -21,7 +22,11 @@ function createWindow(): void {
   })
 
   mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
+    mainWindow?.show()
+  })
+
+  mainWindow.on('closed', () => {
+    mainWindow = null
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -73,43 +78,44 @@ app.on('window-all-closed', () => {
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
 
-// Handle the IPC message to run the Python script
-ipcMain.on('run-python-script', (event) => {
-  if (!pythonProcess) {
-    const scriptPath = path.join(app.getAppPath(), '..', 'app.asar.unpacked', 'python', 'skript.py')
+async function getXmrBtcPrice(): Promise<string> {
+  const url = 'https://tradeogre.com/api/v1/markets'
 
-    // Spuštění Python skriptu s absolutní cestou
-    pythonProcess = spawn('python3', [scriptPath])
+  try {
+    const response = await axios.get(url)
+    const data = response.data
 
-    pythonProcess.stdout.on('data', (data) => {
-      const output = data.toString()
-      console.log(`Výstup skriptu: ${output}`)
-      event.sender.send('python-output', output) // Posíláme data do renderer procesu
-    })
-
-    pythonProcess.stderr.on('data', (data) => {
-      const errorOutput = data.toString()
-      console.error(`Chyba ve skriptu: ${errorOutput}`)
-      event.sender.send('python-error', errorOutput) // Posíláme chyby do renderer procesu
-    })
-
-    pythonProcess.on('close', (code) => {
-      console.log(`Skript skončil s kódem ${code}`)
-      event.sender.send('python-close', `Skript skončil s kódem ${code}`)
-      pythonProcess = null
-    })
-  } else {
-    console.log('Skript již běží.')
+    for (const market of data) {
+      if (market['XMR-BTC']) {
+        const xmrBtcData = market['XMR-BTC']
+        const price = xmrBtcData.price || 'N/A'
+        return price
+      }
+    }
+    return 'N/A'
+  } catch (error: any) {
+    return `Error: Unable to fetch data - ${error.message}`
   }
+}
+
+// Spuštění pravidelného aktualizování ceny
+function continuouslyUpdatePrice(): void {
+  setInterval(async () => {
+    const price = await getXmrBtcPrice()
+    console.log(`The current XMR-BTC price is: ${price}`)
+    if (mainWindow && mainWindow.webContents) {
+      mainWindow.webContents.send('price-update', price)
+    }
+  }, 5000) // Aktualizace každých 5 sekund
+}
+
+// Spuštění aktualizace po startu aplikace
+app.on('ready', () => {
+  continuouslyUpdatePrice()
 })
 
-// Handle the IPC message to stop the Python script
-ipcMain.on('stop-python-script', () => {
-  if (pythonProcess) {
-    pythonProcess.kill()
-    pythonProcess = null
-    console.log('Skript byl úspěšně zastaven.')
-  } else {
-    console.log('Skript neběží.')
-  }
+// IPC komunikace pro ovládání
+ipcMain.on('get-current-price', async (event) => {
+  const price = await getXmrBtcPrice()
+  event.sender.send('price-update', price) // Pošle aktuální cenu na žádost
 })
