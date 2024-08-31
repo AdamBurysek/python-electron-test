@@ -25,7 +25,6 @@ export async function getXmrBtcPrice(): Promise<string> {
 export function continuouslyUpdatePrice(): void {
   setInterval(async () => {
     const price = await getXmrBtcPrice()
-    console.log(`The current XMR-BTC price is: ${price}`)
     if (mainWindow && mainWindow.webContents) {
       mainWindow.webContents.send('price-update', price)
     }
