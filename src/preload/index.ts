@@ -8,7 +8,7 @@ const api = {
     ipcRenderer.send(channel, data)
   },
   receive: (channel: string, func: (...args: any[]) => void): void => {
-    ipcRenderer.on(channel, (event, ...args) => func(...args))
+    ipcRenderer.on(channel, (_event, ...args) => func(...args))
   }
 }
 
