@@ -1,10 +1,10 @@
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
-import { ChildProcessWithoutNullStreams, spawn } from 'child_process'
 import { app, BrowserWindow, ipcMain, shell } from 'electron'
-import path, { join } from 'path'
+import { join } from 'path'
+import { PythonShell } from 'python-shell'
 import icon from '../../resources/icon.png?asset'
 
-let pythonProcess: ChildProcessWithoutNullStreams | null = null
+let pythonShell: PythonShell | null = null
 
 function createWindow(): void {
   // Create the browser window.
@@ -75,28 +75,28 @@ app.on('window-all-closed', () => {
 
 // Handle the IPC message to run the Python script
 ipcMain.on('run-python-script', (event) => {
-  if (!pythonProcess) {
-    const scriptPath = path.join(app.getAppPath(), 'python', 'skript.py')
+  if (!pythonShell) {
+    const scriptPath = app.isPackaged
+      ? join(process.resourcesPath, 'app.asar.unpacked', 'python', 'skript.py')
+      : join(__dirname, '..', 'python', 'skript.py')
 
-    // Spuštění Python skriptu s absolutní cestou
-    pythonProcess = spawn('python3', [scriptPath])
+    // Spuštění Python skriptu pomocí python-shell
+    pythonShell = new PythonShell(scriptPath)
 
-    pythonProcess.stdout.on('data', (data) => {
-      const output = data.toString()
-      console.log(`Výstup skriptu: ${output}`)
-      event.sender.send('python-output', output) // Posíláme data do renderer procesu
+    pythonShell.on('message', (message) => {
+      console.log(`Výstup skriptu: ${message}`)
+      event.sender.send('python-output', message) // Posíláme data do renderer procesu
     })
 
-    pythonProcess.stderr.on('data', (data) => {
-      const errorOutput = data.toString()
-      console.error(`Chyba ve skriptu: ${errorOutput}`)
-      event.sender.send('python-error', errorOutput) // Posíláme chyby do renderer procesu
+    pythonShell.on('error', (err) => {
+      console.error(`Chyba ve skriptu: ${err}`)
+      event.sender.send('python-error', err.message) // Posíláme chyby do renderer procesu
     })
 
-    pythonProcess.on('close', (code) => {
+    pythonShell.on('close', (code) => {
       console.log(`Skript skončil s kódem ${code}`)
       event.sender.send('python-close', `Skript skončil s kódem ${code}`)
-      pythonProcess = null
+      pythonShell = null
     })
   } else {
     console.log('Skript již běží.')
@@ -105,9 +105,9 @@ ipcMain.on('run-python-script', (event) => {
 
 // Handle the IPC message to stop the Python script
 ipcMain.on('stop-python-script', () => {
-  if (pythonProcess) {
-    pythonProcess.kill()
-    pythonProcess = null
+  if (pythonShell) {
+    pythonShell.terminate()
+    pythonShell = null
     console.log('Skript byl úspěšně zastaven.')
   } else {
     console.log('Skript neběží.')
