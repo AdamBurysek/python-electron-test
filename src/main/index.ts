@@ -95,7 +95,7 @@ ipcMain.on('run-python-script', (event) => {
 
     pythonShell.on('close', (code) => {
       console.log(`Skript skončil s kódem ${code}`)
-      event.sender.send('python-close', `Skript skončil s kódem ${code}`)
+      event.sender.send('python-close', `Skript zastaven`)
       pythonShell = null
     })
   } else {
@@ -106,7 +106,7 @@ ipcMain.on('run-python-script', (event) => {
 // Handle the IPC message to stop the Python script
 ipcMain.on('stop-python-script', () => {
   if (pythonShell) {
-    pythonShell.terminate()
+    pythonShell.kill()
     pythonShell = null
     console.log('Skript byl úspěšně zastaven.')
   } else {
