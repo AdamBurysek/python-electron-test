@@ -76,7 +76,7 @@ app.on('window-all-closed', () => {
 // Handle the IPC message to run the Python script
 ipcMain.on('run-python-script', (event) => {
   if (!pythonProcess) {
-    const scriptPath = path.join(app.getAppPath(), '..', 'app.asar.unpacked', 'python', 'skript.py')
+    const scriptPath = path.join(app.getAppPath(), 'python', 'skript.py')
 
     // Spuštění Python skriptu s absolutní cestou
     pythonProcess = spawn('python3', [scriptPath])
