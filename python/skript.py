@@ -8,12 +8,14 @@ def get_price(pair):
     
     if response.status_code == 200:
         data = response.json()
-        if pair in data:
-            market_data = data[pair]
-            price = market_data.get("price", "N/A")
-            return price
-        else:
+        if isinstance(data, list):
+            for market_data in data:
+                if pair in market_data:
+                    price = market_data[pair].get("price", "N/A")
+                    return price
             return f"Error: {pair} not found in market data"
+        else:
+            return "Error: Unexpected data format"
     else:
         return "Error: Unable to fetch data"
 
@@ -25,8 +27,8 @@ def continuously_update_price(pair):
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
-        pair = sys.argv[1]
+        pair = sys.argv[1]  # Načtení páru z příkazové řádky
     else:
-        pair = "XMR-BTC"  # Default value if no argument is provided
+        pair = "BTC-USDT"  # Výchozí hodnota, pokud není zadán žádný argument
 
     continuously_update_price(pair)

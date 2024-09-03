@@ -78,10 +78,10 @@ ipcMain.on('run-python-script', (event, pair) => {
   if (!pythonShell) {
     const scriptPath = app.isPackaged
       ? join(process.resourcesPath, 'app.asar.unpacked', 'python', 'skript.py')
-      : join(__dirname, '..', 'python', 'skript.py')
+      : join(app.getAppPath(), 'python', 'skript.py')
 
     const options = {
-      args: [pair] // Předáváme "XMR-BTC" nebo jiný pár
+      args: [pair]
     }
 
     pythonShell = new PythonShell(scriptPath, options)

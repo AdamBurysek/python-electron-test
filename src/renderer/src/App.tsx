@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import Button from './components/Button'
+import PairSelector from './components/PairSelector'
 
 function App(): JSX.Element {
   const [isRunning, setIsRunning] = useState<boolean>(false)
+  const [pair, setPair] = useState<string>('XMR-BTC')
   const [output, setOutput] = useState<string>('')
   const [error, setError] = useState<string>('')
 
@@ -33,7 +35,8 @@ function App(): JSX.Element {
   const handleRunScript = (): void => {
     if (window.api) {
       setIsRunning(true)
-      window.api.send('run-python-script', 'XMR-BTC')
+      console.log(pair)
+      window.api.send('run-python-script', pair)
     }
   }
 
@@ -48,6 +51,9 @@ function App(): JSX.Element {
     <div className="flex flex-col items-center justify-center h-screen gap-4 [background:radial-gradient(125%_125%_at_50%_10%,#000_40%,#63e_100%)]">
       <h1 className="text-3xl font-bold text-white pb-8">Ovládání Python Skriptu</h1>
       <div className="flex gap-4">
+        <PairSelector
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>): void => setPair(e.target.value)}
+        />
         <Button
           onClick={isRunning ? handleStopScript : handleRunScript}
           label={isRunning ? 'Zastavit skript' : 'Spustit skript'}
