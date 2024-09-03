@@ -35,7 +35,6 @@ function App(): JSX.Element {
   const handleRunScript = (): void => {
     if (window.api) {
       setIsRunning(true)
-      console.log(pair)
       window.api.send('run-python-script', pair)
     }
   }
@@ -53,6 +52,7 @@ function App(): JSX.Element {
       <div className="flex gap-4">
         <PairSelector
           onChange={(e: React.ChangeEvent<HTMLSelectElement>): void => setPair(e.target.value)}
+          isRunning={isRunning}
         />
         <Button
           onClick={isRunning ? handleStopScript : handleRunScript}
