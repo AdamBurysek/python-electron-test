@@ -87,7 +87,6 @@ ipcMain.on('run-python-script', (event, pair) => {
     pythonShell = new PythonShell(scriptPath, options)
 
     pythonShell.on('message', (message) => {
-      console.log(`Výstup skriptu: ${message}`)
       event.sender.send('python-output', message) // Posíláme data do renderer procesu
     })
 
