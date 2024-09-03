@@ -33,7 +33,7 @@ function App(): JSX.Element {
   const handleRunScript = (): void => {
     if (window.api) {
       setIsRunning(true)
-      window.api.send('run-python-script')
+      window.api.send('run-python-script', 'XMR-BTC')
     }
   }
 

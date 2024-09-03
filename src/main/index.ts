@@ -74,14 +74,17 @@ app.on('window-all-closed', () => {
 // code. You can also put them in separate files and require them here.
 
 // Handle the IPC message to run the Python script
-ipcMain.on('run-python-script', (event) => {
+ipcMain.on('run-python-script', (event, pair) => {
   if (!pythonShell) {
     const scriptPath = app.isPackaged
       ? join(process.resourcesPath, 'app.asar.unpacked', 'python', 'skript.py')
       : join(__dirname, '..', 'python', 'skript.py')
 
-    // Spuštění Python skriptu pomocí python-shell
-    pythonShell = new PythonShell(scriptPath)
+    const options = {
+      args: [pair] // Předáváme "XMR-BTC" nebo jiný pár
+    }
+
+    pythonShell = new PythonShell(scriptPath, options)
 
     pythonShell.on('message', (message) => {
       console.log(`Výstup skriptu: ${message}`)
