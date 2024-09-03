@@ -4,7 +4,7 @@ import PairSelector from './components/PairSelector'
 
 function App(): JSX.Element {
   const [isRunning, setIsRunning] = useState<boolean>(false)
-  const [pair, setPair] = useState<string>('XMR-BTC')
+  const [pair, setPair] = useState<string>('BTC-USDT')
   const [output, setOutput] = useState<string>('')
   const [error, setError] = useState<string>('')
 

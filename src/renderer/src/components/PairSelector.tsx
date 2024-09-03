@@ -8,9 +8,9 @@ const PairSelector: React.FC<Props> = ({ onChange }) => {
   return (
     <select onChange={onChange} className="px-2 rounded-xl font-bold">
       <optgroup label="USDT">
+        <option value="BTC-USDT">BTC-USDT</option>
         <option value="XMR-USDT">XMR-USDT</option>
         <option value="LTC-USDT">LTC-USDT</option>
-        <option value="BTC-USDT">BTC-USDT</option>
       </optgroup>
       <hr />
       <optgroup label="BTC">
