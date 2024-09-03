@@ -22,7 +22,9 @@
   "dependencies": {
     "@electron-toolkit/preload": "^2.0.0",
     "@electron-toolkit/utils": "^1.0.2",
-    "python-shell": "^5.0.0"
+    "clsx": "^2.1.1",
+    "python-shell": "^5.0.0",
+    "tailwind-merge": "^2.5.2"
   },
   "devDependencies": {
     "@electron-toolkit/tsconfig": "^1.0.1",
