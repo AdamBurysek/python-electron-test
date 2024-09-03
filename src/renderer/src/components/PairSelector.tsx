@@ -6,13 +6,19 @@ interface Props {
 
 const PairSelector: React.FC<Props> = ({ onChange }) => {
   return (
-    <select onChange={onChange}>
-      <option value="XMR-BTC">XMR-BTC</option>
-      <option value="LTC-BTC">LTC-BTC</option>
-      <option value="ETH-BTC">ETH-BTC</option>
-      <option value="XMR-USDT">XMR-USDT</option>
-      <option value="LTC-USDT">LTC-USDT</option>
-      <option value="BTC-USDT">BTC-USDT</option>
+    <select onChange={onChange} className="px-2 rounded-xl font-bold">
+      <optgroup label="USDT">
+        <option value="XMR-USDT">XMR-USDT</option>
+        <option value="LTC-USDT">LTC-USDT</option>
+        <option value="BTC-USDT">BTC-USDT</option>
+      </optgroup>
+      <hr />
+      <optgroup label="BTC">
+        <option value="XMR-BTC">XMR-BTC</option>
+        <option value="LTC-BTC">LTC-BTC</option>
+        <option value="ETH-BTC">ETH-BTC</option>
+      </optgroup>
+      <hr />
     </select>
   )
 }
