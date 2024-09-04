@@ -5,10 +5,11 @@ import { PythonShell } from 'python-shell'
 import icon from '../../resources/icon.png?asset'
 
 let pythonShell: PythonShell | null = null
+let mainWindow: BrowserWindow | null = null
 
 function createWindow(): void {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
     show: false,
@@ -21,7 +22,16 @@ function createWindow(): void {
   })
 
   mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
+    if (mainWindow) {
+      mainWindow.show()
+    }
+  })
+
+  mainWindow.on('closed', () => {
+    if (pythonShell) {
+      pythonShell.kill()
+      pythonShell = null
+    }
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -67,10 +77,6 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
-    if (pythonShell) {
-      pythonShell.kill()
-      pythonShell = null
-    }
   }
 })
 
@@ -91,18 +97,15 @@ ipcMain.on('run-python-script', (event, pair) => {
     pythonShell = new PythonShell(scriptPath, options)
 
     pythonShell.on('message', (message) => {
-      event.sender.send('python-output', message)
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        // Zkontroluj, zda okno stále existuje, než odešleš zprávu
+        event.sender.send('python-output', message)
+      }
     })
 
     pythonShell.on('error', (err) => {
       console.error(`Chyba ve skriptu: ${err}`)
       event.sender.send('python-error', err.message)
-    })
-
-    pythonShell.on('close', (code) => {
-      console.log(`Skript skončil s kódem ${code}`)
-      event.sender.send('python-close', `Skript zastaven`)
-      pythonShell = null
     })
   } else {
     console.log('Skript již běží.')
