@@ -67,6 +67,10 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
+    if (pythonShell) {
+      pythonShell.kill()
+      pythonShell = null
+    }
   }
 })
 
@@ -87,12 +91,12 @@ ipcMain.on('run-python-script', (event, pair) => {
     pythonShell = new PythonShell(scriptPath, options)
 
     pythonShell.on('message', (message) => {
-      event.sender.send('python-output', message) // Posíláme data do renderer procesu
+      event.sender.send('python-output', message)
     })
 
     pythonShell.on('error', (err) => {
       console.error(`Chyba ve skriptu: ${err}`)
-      event.sender.send('python-error', err.message) // Posíláme chyby do renderer procesu
+      event.sender.send('python-error', err.message)
     })
 
     pythonShell.on('close', (code) => {
