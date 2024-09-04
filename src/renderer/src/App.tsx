@@ -19,16 +19,10 @@ function App(): JSX.Element {
       setError((prevError) => prevError + data)
     })
 
-    // Reakce na ukončení Python skriptu
-    window.api.receive('python-close', (message: string) => {
-      setOutput(message)
-    })
-
     return () => {
       // Vyčištění listenerů při odchodu z komponenty
       window.api.receive('python-output', () => {})
       window.api.receive('python-error', () => {})
-      window.api.receive('python-close', () => {})
     }
   }, [])
 
