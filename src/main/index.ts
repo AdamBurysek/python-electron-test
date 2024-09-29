@@ -41,8 +41,8 @@ function createWindow(): void {
 
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
-  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
+  if (is.dev && process.env.ELECTRON_RENDERER_URL) {
+    mainWindow.loadURL(process.env.ELECTRON_RENDERER_URL)
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
@@ -98,7 +98,6 @@ ipcMain.on('run-python-script', (event, pair) => {
 
     pythonShell.on('message', (message) => {
       if (mainWindow && !mainWindow.isDestroyed()) {
-        // Zkontroluj, zda okno stále existuje, než odešleš zprávu
         event.sender.send('python-output', message)
       }
     })

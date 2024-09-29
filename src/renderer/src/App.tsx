@@ -9,18 +9,18 @@ function App(): JSX.Element {
   const [error, setError] = useState<string>('')
 
   useEffect(() => {
-    // Přijímání výstupu z Python skriptu
+    // Handle Python output
     window.api.receive('python-output', (data: string) => {
       setOutput(data)
     })
 
-    // Přijímání chybových zpráv z Python skriptu
+    // Handle Python errors
     window.api.receive('python-error', (data: string) => {
       setError((prevError) => prevError + data)
     })
 
     return () => {
-      // Vyčištění listenerů při odchodu z komponenty
+      // Cleanup event listeners
       window.api.receive('python-output', () => {})
       window.api.receive('python-error', () => {})
     }
@@ -41,8 +41,8 @@ function App(): JSX.Element {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen gap-4 [background:radial-gradient(125%_125%_at_50%_10%,#000_40%,#63e_100%)]">
-      <h1 className="text-3xl font-bold text-white pb-8">Ovládání Python Skriptu</h1>
+    <div className="flex h-screen flex-col items-center justify-center gap-4 [background:radial-gradient(125%_125%_at_50%_10%,#000_40%,#63e_100%)]">
+      <h1 className="pb-8 text-3xl font-bold text-white">Ovládání Python Skriptu</h1>
       <div className="flex gap-4">
         <PairSelector
           onChange={(e: React.ChangeEvent<HTMLSelectElement>): void => setPair(e.target.value)}

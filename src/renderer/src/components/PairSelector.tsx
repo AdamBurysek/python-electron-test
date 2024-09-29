@@ -10,7 +10,7 @@ const PairSelector: React.FC<Props> = ({ onChange, isRunning }) => {
     <select
       onChange={onChange}
       disabled={isRunning}
-      className="px-2 rounded-xl font-bold text-center"
+      className="rounded-xl px-2 text-center font-bold"
     >
       <optgroup label="USDT">
         <option value="BTC-USDT">BTC-USDT</option>

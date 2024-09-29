@@ -11,7 +11,7 @@ const Button = ({ onClick, label, className }: Props): JSX.Element => {
     <button
       onClick={onClick}
       className={cn(
-        'bg-cyan-400 rounded-xl w-40 py-2 text-black font-semibold hover:bg-cyan-300',
+        'w-40 rounded-xl bg-cyan-400 py-2 font-semibold text-black hover:bg-cyan-300',
         className
       )}
     >
